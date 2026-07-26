@@ -1,35 +1,45 @@
-const Database = require("better-sqlite3");
-const path = require("path");
+const { createClient } = require("@libsql/client");
 
-const dbPath =
-  process.env.TASKS_DB_PATH || path.join(__dirname, "..", "tasks.db");
-const db = new Database(dbPath);
+const url =
+  process.env.TURSO_DATABASE_URL ||
+  process.env.TASKS_DB_PATH ||
+  "file:tasks.db";
+const authToken = process.env.TURSO_AUTH_TOKEN;
 
-db.pragma("journal_mode = WAL");
+const client = createClient(authToken ? { url, authToken } : { url });
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    done INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`);
+const init = async () => {
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      done INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
 
-const countRow = db.prepare("SELECT COUNT(*) AS count FROM tasks").get();
+  const countResult = await client.execute(
+    "SELECT COUNT(*) AS count FROM tasks",
+  );
+  const count = Number(countResult.rows[0].count);
 
-if (countRow.count === 0) {
-  const insert = db.prepare("INSERT INTO tasks (title, done) VALUES (?, ?)");
-  const seed = db.transaction((tasks) => {
-    tasks.forEach((task) => insert.run(task.title, task.done ? 1 : 0));
-  });
+  if (count === 0) {
+    const seed = [
+      { title: "Buy milk", done: 0 },
+      { title: "Finish FlyRank BE-02 assignment", done: 0 },
+      { title: "Read SQLite documentation", done: 1 },
+    ];
 
-  seed([
-    { title: "Buy milk", done: false },
-    { title: "Finish FlyRank BE-02 assignment", done: false },
-    { title: "Read SQLite documentation", done: true },
-  ]);
-}
+    for (const task of seed) {
+      await client.execute({
+        sql: "INSERT INTO tasks (title, done) VALUES (?, ?)",
+        args: [task.title, task.done],
+      });
+    }
+  }
+};
 
-module.exports = db;
+const ready = init();
+
+module.exports = { client, ready };
