@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyRank BE Task 2 API</title>
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --card: #131722;
+        --card2: #171c2a;
+        --accent: #6366f1;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --green: #22c55e;
+        --red: #ef4444;
+        --amber: #f59e0b;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: radial-gradient(circle at top left, #161b2b, #0b0d12 60%);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 20px;
+      }
+      .container {
+        max-width: 760px;
+        width: 100%;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: rgba(99, 102, 241, 0.15);
+        color: var(--accent);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 32px;
+        margin-bottom: 8px;
+      }
+      p.sub {
+        color: var(--muted);
+        margin-bottom: 32px;
+        font-size: 15px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+      }
+      .card:hover {
+        border-color: var(--accent);
+      }
+      .method {
+        display: inline-block;
+        background: var(--accent);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-right: 10px;
+      }
+      code {
+        color: #a5b4fc;
+        font-size: 14px;
+      }
+      .desc {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .hint {
+        color: #6b7280;
+        font-size: 11px;
+        margin-top: 8px;
+        font-style: italic;
+      }
+      #output-panel {
+        display: none;
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      #output-panel.visible {
+        display: block;
+      }
+      pre {
+        background: #0b0d12;
+        border-radius: 10px;
+        padding: 16px;
+        overflow-x: auto;
+        font-size: 13px;
+        color: #d1d5db;
+        max-height: 320px;
+        overflow-y: auto;
+      }
+      footer {
+        margin-top: 32px;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <span class="badge">FLYRANK &middot; BE-02</span>
+      <h1>FlyRank BE Task 2 API</h1>
+      <p class="sub">
+        A CRUD task API backed by SQLite, built for the FlyRank Backend AI
+        Engineering internship.
+      </p>
+
+      <div class="card" data-method="GET" data-endpoint="/tasks">
+        <span class="method">GET</span><code>/tasks</code>
+        <div class="desc">
+          List all tasks. Supports ?search=, ?done=, and ?sort=title.
+        </div>
+        <div class="hint">Click to run this request live</div>
+      </div>
+      <div class="card" data-method="GET" data-endpoint="/tasks/1">
+        <span class="method">GET</span><code>/tasks/:id</code>
+        <div class="desc">Fetch a single task by id.</div>
+        <div class="hint">Click to run this request live (uses id = 1)</div>
+      </div>
+      <div class="card" data-method="GET" data-endpoint="/stats">
+        <span class="method">GET</span><code>/stats</code>
+        <div class="desc">Total, completed, and pending task counts.</div>
+        <div class="hint">Click to run this request live</div>
+      </div>
+
+      <div id="output-panel">
+        <pre id="output-body">{}</pre>
+      </div>
+
+      <footer>
+        Built by
+        <a
+          href="https://www.linkedin.com/in/muhammad-ashhadullah-zaheer-41194a340/"
+          target="_blank"
+          >Muhammad Ashhadullah Zaheer</a
+        >
+      </footer>
+    </div>
+
+    <script>
+      document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("click", async () => {
+          const endpoint = card.getAttribute("data-endpoint");
+          const panel = document.getElementById("output-panel");
+          const body = document.getElementById("output-body");
+          panel.classList.add("visible");
+          body.textContent = "Loading...";
+          try {
+            const res = await fetch(endpoint);
+            const json = await res.json();
+            body.textContent = JSON.stringify(json, null, 2);
+          } catch (err) {
+            body.textContent = "Request failed: " + err.message;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
