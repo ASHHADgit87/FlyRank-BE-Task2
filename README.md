@@ -89,18 +89,6 @@ Centralized Error Handler (on failure)
 
 ---
 
-# Getting Started
-```bash
-git clone https://github.com/ASHHADgit87/FlyRank-BE-Task2.git
-cd FlyRank-BE-Task2
-npm install
-copy .env.example .env
-npm run dev
-```
-Server runs at `http://localhost:5000`.
-
----
-
 # Testing
 ```bash
 npm test
