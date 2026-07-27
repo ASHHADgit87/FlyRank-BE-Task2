@@ -1,4 +1,4 @@
-# FlyRank BE Task 2
+# FlyRank BE Task 2 - CRUD with SQLite3
 **FlyRank BE Task 2** is a production-styled Express.js REST API built for the FlyRank Backend AI Engineering internship (BE-02). It continues directly from BE-01/Task 1's in-memory CRUD by replacing the storage layer with a persistent SQLite-compatible database, while keeping the API contract identical — proving persistence is an implementation detail behind the API, not a change to the API itself.
 
 ---
