@@ -6,131 +6,529 @@
     <title>FlyRank BE Task 2 API</title>
     <style>
       :root {
-        --bg: #0b0d12;
-        --card: #131722;
-        --card2: #171c2a;
-        --accent: #6366f1;
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --green: #22c55e;
-        --red: #ef4444;
-        --amber: #f59e0b;
+        --bg: #06090a;
+        --emerald: #34d399;
+        --amber: #fbbf24;
+        --crimson: #fb7185;
+        --glass: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.12);
+        --text: #eafff5;
+        --muted: #8fa39a;
       }
+
       * {
         box-sizing: border-box;
-        margin: 0;
-        padding: 0;
       }
+
+      html,
       body {
-        background: radial-gradient(circle at top left, #161b2b, #0b0d12 60%);
-        color: var(--text);
-        font-family: "Segoe UI", system-ui, sans-serif;
+        margin: 0;
         min-height: 100vh;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 40px 20px;
+        background: var(--bg);
       }
+
+      body {
+        color: var(--text);
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        overflow-x: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+      }
+
+      .scene {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        perspective: 1200px;
+        overflow: hidden;
+      }
+
+      .glow {
+        position: absolute;
+        inset: -20%;
+        filter: blur(90px);
+        opacity: 0.45;
+      }
+      .glow span {
+        position: absolute;
+        border-radius: 50%;
+        mix-blend-mode: screen;
+      }
+      .glow span:nth-child(1) {
+        width: 540px;
+        height: 540px;
+        top: 2%;
+        left: 4%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          var(--emerald),
+          transparent 70%
+        );
+        animation: driftA 19s ease-in-out infinite;
+      }
+      .glow span:nth-child(2) {
+        width: 460px;
+        height: 460px;
+        bottom: -4%;
+        right: 4%;
+        background: radial-gradient(
+          circle at 60% 40%,
+          var(--amber),
+          transparent 70%
+        );
+        animation: driftB 23s ease-in-out infinite;
+      }
+      .glow span:nth-child(3) {
+        width: 400px;
+        height: 400px;
+        top: 42%;
+        left: 42%;
+        background: radial-gradient(
+          circle at 50% 50%,
+          var(--crimson),
+          transparent 70%
+        );
+        animation: driftC 27s ease-in-out infinite;
+      }
+      @keyframes driftA {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(65px, 45px) scale(1.15);
+        }
+      }
+      @keyframes driftB {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(-55px, -35px) scale(1.1);
+        }
+      }
+      @keyframes driftC {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          transform: translate(-45%, -57%) scale(1.2);
+        }
+      }
+
+      .hex-overlay {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(
+            30deg,
+            rgba(52, 211, 153, 0.05) 12%,
+            transparent 12.5%,
+            transparent 87%,
+            rgba(52, 211, 153, 0.05) 87.5%,
+            rgba(52, 211, 153, 0.05)
+          ),
+          linear-gradient(
+            150deg,
+            rgba(52, 211, 153, 0.05) 12%,
+            transparent 12.5%,
+            transparent 87%,
+            rgba(52, 211, 153, 0.05) 87.5%,
+            rgba(52, 211, 153, 0.05)
+          );
+        background-size: 60px 104px;
+        mask-image: radial-gradient(circle at 50% 25%, black, transparent 72%);
+      }
+
+      .shape-field {
+        position: absolute;
+        inset: 0;
+        transform-style: preserve-3d;
+      }
+
+      /* Rotating tetrahedron (4 triangular faces) */
+      .tetra-scene {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 12%;
+        right: 9%;
+        transform-style: preserve-3d;
+        animation: floatTetra 10s ease-in-out infinite;
+      }
+      .tetra {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: spinTetra 15s linear infinite;
+      }
+      .tetra .face {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 90px solid rgba(52, 211, 153, 0.22);
+        left: 0;
+        top: 0;
+      }
+      .tetra .face1 {
+        transform: translateZ(28px) rotateX(10deg);
+      }
+      .tetra .face2 {
+        transform: rotateY(120deg) translateZ(28px) rotateX(10deg);
+        border-bottom-color: rgba(251, 191, 36, 0.22);
+      }
+      .tetra .face3 {
+        transform: rotateY(240deg) translateZ(28px) rotateX(10deg);
+        border-bottom-color: rgba(251, 113, 133, 0.22);
+      }
+      .tetra .face4 {
+        transform: rotateX(-100deg) translateZ(28px);
+        border-bottom-color: rgba(255, 255, 255, 0.12);
+      }
+
+      @keyframes spinTetra {
+        from {
+          transform: rotateY(0) rotateX(0);
+        }
+        to {
+          transform: rotateY(360deg) rotateX(360deg);
+        }
+      }
+      @keyframes floatTetra {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-22px);
+        }
+      }
+
+      .atom {
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        left: 5%;
+        bottom: 10%;
+        transform-style: preserve-3d;
+        animation: floatAtom 13s ease-in-out infinite;
+      }
+      .atom .nucleus {
+        position: absolute;
+        width: 26px;
+        height: 26px;
+        top: 50%;
+        left: 50%;
+        margin: -13px 0 0 -13px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fff,
+          var(--emerald) 60%,
+          transparent 80%
+        );
+        box-shadow: 0 0 30px 6px rgba(52, 211, 153, 0.5);
+      }
+      .atom .orbit {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+      }
+      .atom .orbit::after {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        top: -6px;
+        left: 50%;
+        margin-left: -6px;
+        background: var(--amber);
+        box-shadow: 0 0 12px 3px rgba(251, 191, 36, 0.6);
+      }
+      .atom .orbit.o1 {
+        animation: spinOrbit 6s linear infinite;
+      }
+      .atom .orbit.o2 {
+        transform: rotateZ(60deg);
+        animation: spinOrbit 8s linear infinite reverse;
+      }
+      .atom .orbit.o2::after {
+        background: var(--crimson);
+        box-shadow: 0 0 12px 3px rgba(251, 113, 133, 0.6);
+      }
+      .atom .orbit.o3 {
+        transform: rotateZ(120deg);
+        animation: spinOrbit 10s linear infinite;
+      }
+
+      @keyframes spinOrbit {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes floatAtom {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-18px) rotate(6deg);
+        }
+      }
+
+      @media (max-width: 880px) {
+        .tetra-scene,
+        .atom {
+          display: none;
+        }
+      }
+
       .container {
+        position: relative;
+        z-index: 1;
         max-width: 760px;
         width: 100%;
       }
+
       .badge {
-        display: inline-block;
-        padding: 4px 12px;
-        background: rgba(99, 102, 241, 0.15);
-        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
         border-radius: 999px;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
         font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 16px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--emerald);
+        margin-bottom: 18px;
       }
+      .badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--emerald);
+        box-shadow: 0 0 10px 2px var(--emerald);
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
+        }
+      }
+
       h1 {
-        font-size: 32px;
-        margin-bottom: 8px;
+        font-size: 40px;
+        margin: 0 0 8px;
+        line-height: 1.1;
+        background: linear-gradient(
+          120deg,
+          #ffffff 10%,
+          var(--emerald) 45%,
+          var(--amber) 85%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
       }
+
       p.sub {
         color: var(--muted);
-        margin-bottom: 32px;
+        margin: 0 0 32px;
         font-size: 15px;
+        max-width: 520px;
       }
+
       .card {
-        background: var(--card);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 14px;
+        position: relative;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
         padding: 20px;
         margin-bottom: 12px;
         cursor: pointer;
-        transition: border-color 0.2s ease;
+        backdrop-filter: blur(14px);
+        transform-style: preserve-3d;
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, var(--emerald), var(--amber));
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        z-index: -1;
       }
       .card:hover {
-        border-color: var(--accent);
+        transform: translateY(-4px) rotateX(4deg);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 14px 30px -12px rgba(52, 211, 153, 0.4);
       }
+      .card:hover::before {
+        opacity: 0.1;
+      }
+
       .method {
         display: inline-block;
-        background: var(--accent);
-        color: #fff;
+        background: linear-gradient(120deg, var(--emerald), #10b981);
+        color: #04140d;
         font-size: 11px;
-        font-weight: 700;
-        padding: 3px 8px;
+        font-weight: 800;
+        padding: 3px 10px;
         border-radius: 6px;
         margin-right: 10px;
       }
       code {
-        color: #a5b4fc;
+        color: var(--amber);
         font-size: 14px;
       }
       .desc {
         color: var(--muted);
         font-size: 13px;
-        margin-top: 6px;
+        margin-top: 8px;
       }
       .hint {
-        color: #6b7280;
+        color: #647a70;
         font-size: 11px;
         margin-top: 8px;
         font-style: italic;
       }
+
       #output-panel {
         display: none;
-        background: var(--card);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
-        padding: 20px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        background: #04070a;
         margin-top: 20px;
       }
       #output-panel.visible {
         display: block;
       }
+
+      .output-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid var(--glass-border);
+        font-size: 12px;
+        color: var(--muted);
+        font-family: "Consolas", monospace;
+      }
+      .output-header .traffic {
+        display: flex;
+        gap: 6px;
+        margin-right: 6px;
+      }
+      .output-header .traffic span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .output-header .traffic span:nth-child(1) {
+        background: var(--crimson);
+      }
+      .output-header .traffic span:nth-child(2) {
+        background: var(--amber);
+      }
+      .output-header .traffic span:nth-child(3) {
+        background: var(--emerald);
+      }
+
       pre {
-        background: #0b0d12;
-        border-radius: 10px;
-        padding: 16px;
+        margin: 0;
+        background: transparent;
+        border-radius: 0;
+        padding: 18px;
         overflow-x: auto;
         font-size: 13px;
-        color: #d1d5db;
+        color: #c9f7e4;
         max-height: 320px;
         overflow-y: auto;
+        font-family: "Consolas", "SF Mono", monospace;
+        line-height: 1.6;
       }
+
       footer {
-        margin-top: 32px;
+        margin-top: 28px;
         color: var(--muted);
         font-size: 13px;
         text-align: center;
       }
       footer a {
-        color: var(--accent);
+        color: var(--emerald);
         text-decoration: none;
+        font-weight: 600;
+      }
+      footer a:hover {
+        text-decoration: underline;
       }
     </style>
   </head>
   <body>
+    <div class="scene">
+      <div class="glow"><span></span><span></span><span></span></div>
+      <div class="hex-overlay"></div>
+      <div class="shape-field">
+        <div class="tetra-scene">
+          <div class="tetra">
+            <div class="face face1"></div>
+            <div class="face face2"></div>
+            <div class="face face3"></div>
+            <div class="face face4"></div>
+          </div>
+        </div>
+        <div class="atom">
+          <div class="nucleus"></div>
+          <div class="orbit o1"></div>
+          <div class="orbit o2"></div>
+          <div class="orbit o3"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="container">
-      <span class="badge">FLYRANK &middot; BE-02</span>
+      <span class="badge"
+        ><span class="dot"></span> FlyRank &middot; BE-02</span
+      >
       <h1>FlyRank BE Task 2 API</h1>
       <p class="sub">
-        A CRUD task API backed by SQLite, built for the FlyRank Backend AI
-        Engineering internship.
+        A CRUD task API backed by a persistent SQLite-compatible database, built
+        for the FlyRank Backend AI Engineering internship.
       </p>
 
       <div class="card" data-method="GET" data-endpoint="/tasks">
@@ -152,6 +550,10 @@
       </div>
 
       <div id="output-panel">
+        <div class="output-header">
+          <span class="traffic"><span></span><span></span><span></span></span>
+          response.json
+        </div>
         <pre id="output-body">{}</pre>
       </div>
 
